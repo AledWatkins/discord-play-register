@@ -198,7 +198,11 @@ class SameHandler(GameExtractionMixin, ContentBasedHandler):
         return ["%s would also play %s (%s)" % (message.author.display_name, game, len(game.get_available_players()))] + get_any_ready_messages(game)
 
     def get_all_responses_with_games(self, message, games):
-        last_would_plays_for_listed_games = set(db.get_last_would_play(game).game for game in games)
+        last_would_plays_for_listed_games = []
+        for game in games:
+            last_wp = db.get_last_would_play(game)
+            if last_wp:
+                last_would_plays_for_listed_games.append(last_wp.game)
 
         would_plays = [db.record_would_play(message.author, game) for game in last_would_plays_for_listed_games]
         game_and_players_strings = ["%s (%s)" % (game.name, len(game.get_available_players())) for game in last_would_plays_for_listed_games]
